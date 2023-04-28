@@ -12,11 +12,12 @@ import { TextareaAutosize } from '@mui/material';
 import { InputLabel} from '@mui/material';
 import { FormControlLabel , Checkbox } from '@mui/material';
 import Navbar from '../components/Navbar';
+import axios from 'axios';
 
 const theme = createTheme();
 
 export default function SignUp() {
-
+  
   const formik = useFormik({
     initialValues: {
       name : '',
@@ -24,13 +25,11 @@ export default function SignUp() {
       website : '',
       contact_number : '',
       registration_id : '',
-      company_code : '',
       owner_id : '',
-      company_logo : '',
       company_color_code : '',
       country : '',
       state : '',
-      description : '',
+      description : ''
     },
 
     validationSchema: Yup.object({
@@ -49,13 +48,9 @@ export default function SignUp() {
       registration_id: Yup.number()
         .min(20, 'Must be 20 characters or more')
         .required('Required'),
-      company_code: Yup.string()
-        .min(5, 'Must be 5 characters or less'),
       owner_id: Yup.number()
         .min(5, 'Must be 5 characters or less')
-        .required('Required'),
-      company_logo: Yup.string()
-        .min(5, 'Must be 5 characters or less'),  
+        .required('Required'),  
       company_color_code: Yup.string()
         .min(5, 'Must be 5 characters or less'),
       country: Yup.string()
@@ -65,14 +60,26 @@ export default function SignUp() {
     }),
 
     onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
+      axios.post('http://localhost:8080/api/v1/company' , JSON.stringify(values) , {headers : {'Content-Type' : 'application/json'}})
+      .then(res => {
+        console.log(res)
+      }
+      )
+      .catch(err => {
+        console.log(err)
+      }
+      )
     },
   });
+
+  
+
+
 
   return (
     <ThemeProvider theme={theme}>
       <Navbar/>
-        <Container component="main" maxWidth="md" xs={12} style={{
+        <Container component="main" maxWidth="lg" xs={12} style={{
           backgroundColor: 'white',
           borderRadius: '10px',
           marginTop : '93px',
@@ -163,21 +170,6 @@ export default function SignUp() {
 
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    name = "company_code"
-                    fullWidth
-                    id="company_code"
-                    label="Company Code"
-                    autoComplete="company_code"
-                    type='text'
-                    helperText={formik.touched.company_code && formik.errors.company_code}
-                    error={formik.touched.company_code && Boolean(formik.errors.company_code)}
-                    value={formik.values.company_code}
-                    onChange={formik.handleChange}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
                     name = "owner_id"
                     fullWidth
                     id="owner_id"
@@ -201,6 +193,9 @@ export default function SignUp() {
                       id="company_logo"
                       name="company_logo"
                       label="Company Logo"
+                      onChange={(event) => {  
+                        formik.setFieldValue("company_logo", event.currentTarget.files[0]);
+                      }}
 
                     />
                     {
