@@ -11,12 +11,16 @@ import * as Yup from 'yup';
 import { TextareaAutosize } from '@mui/material';
 import { InputLabel} from '@mui/material';
 import { FormControlLabel , Checkbox } from '@mui/material';
-import Navbar from '../components/Navbar';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Link } from '@mui/material';
+
 
 const theme = createTheme();
 
 export default function SignUp() {
+
+  const navigate = useNavigate();
   
   const formik = useFormik({
     initialValues: {
@@ -60,25 +64,24 @@ export default function SignUp() {
     }),
 
     onSubmit: values => {
-      axios.post('http://localhost:8080/api/v1/company' , JSON.stringify(values) , {headers : {'Content-Type' : 'application/json'}})
-      .then(res => {
-        console.log(res)
+      try {
+        axios.post('http://localhost:8080/api/v1/company' , JSON.stringify(values) , {headers : {'Content-Type' : 'application/json'}})
+        .then(res => {
+          console.log(res)}
+          )
+        .catch(err => {
+          console.log(err)
+        }
+        )
+      } catch (error) {
+        console.log(error)
       }
-      )
-      .catch(err => {
-        console.log(err)
-      }
-      )
     },
   });
-
-  
-
 
 
   return (
     <ThemeProvider theme={theme}>
-      <Navbar/>
         <Container component="main" maxWidth="lg" xs={12} style={{
           backgroundColor: 'white',
           borderRadius: '10px',
@@ -292,7 +295,20 @@ export default function SignUp() {
               </Button>
 
             </Box>
+
+
           </Box>
+
+            <Grid container justifyContent="flex-end">
+                <Grid item>
+                  <Link onClick = {() => navigate('/signin')} variant="body2" style = {{
+                    cursor: 'pointer'
+                  }}>
+                    Already have an User Account? Sign in
+                  </Link>
+                </Grid>
+            </Grid>
+
         </Container>
     </ThemeProvider>
   );

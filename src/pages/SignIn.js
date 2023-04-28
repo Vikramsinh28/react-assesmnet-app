@@ -9,12 +9,10 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Navbar from '../components/Navbar';
 import  { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
-
 
 const theme = createTheme();
 
@@ -32,24 +30,28 @@ export default function SignIn() {
             password: Yup.string().required('Required')
         }),
         onSubmit: values => {
-            axios.post('http://localhost:8080/api/v1/users/login', JSON.stringify(values), {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                console.log(response.data);
-                if (response.data.status === 200) {
-                    navigate('/');
-                }
-            }).catch(error => {
-                console.log(error);
-            })
+            try{
+              axios.post('http://localhost:8080/api/v1/users/login', JSON.stringify(values), {
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              }).then(response => {
+                  console.log(response.data);
+                  localStorage.setItem('token', JSON.stringify(response.data.data.token));
+                  if (response.data.status === 200) {
+                      navigate('/');
+                  }
+              }).catch(error => {
+                  console.log(error);
+              })
+            }catch(error){
+              console.log(error);
+            }
         }
     })
 
   return (
     <ThemeProvider theme={theme}>
-      <Navbar/>
       <Container component="main" maxWidth="md" style={{
           backgroundColor: 'white',
           borderRadius: '10px',
@@ -108,13 +110,20 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
                 </Link>
               </Grid>
+              <Grid item>
+                  <Link onClick={() => navigate('/signup')} variant="body2">
+                    {"Don't have an account? Sign Up"}
+                  </Link>
+              </Grid>
             </Grid>
+
           </Box>
         </Box>
       </Container>
